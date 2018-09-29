@@ -3,6 +3,15 @@
 
 Creates an interface to add and remove a repeatable group of input elements.
 
+## Modifications
+
+This fork has been modified in the following significant areas:
+
+* Add support for number inputs when serializing list
+* Use dot format (list[0].name) instead of square bracket format (list[0][name])
+  when serializing and parsing repeater data, primarily for compatibility with
+  Spring Boot backends.
+
 ### [Demo](http://briandetering.net/repeater)
 
 `bower install jquery.repeater --save`

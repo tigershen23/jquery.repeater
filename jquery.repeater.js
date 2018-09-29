@@ -1,6 +1,6 @@
 // jquery.repeater version 1.2.1
 // https://github.com/DubFriend/jquery.repeater
-// (MIT) 09-10-2016
+// (MIT) 29-09-2018
 // Brian Detering <BDeterin@gmail.com> (http://www.briandetering.net/)
 (function ($) {
 'use strict';
@@ -730,13 +730,17 @@ $.fn.repeaterVal = function () {
         foreach(raw, function (val, key) {
             var parsedKey = [];
             if(key !== "undefined") {
-                parsedKey.push(key.match(/^[^\[]*/)[0]);
-                parsedKey = parsedKey.concat(map(
-                    key.match(/\[[^\]]*\]/g),
-                    function (bracketed) {
-                        return bracketed.replace(/[\[\]]/g, '');
-                    }
-                ));
+                // Parse ["units", "0", "name"] from "units[0].name"
+                const prefix = key.match(/^[^\[]*/)[0];
+                parsedKey.push(prefix);
+                const indicesAndAttributes = key
+                    .match(/\[[^\]]*\]/g)
+                    .concat(key.match(/[^.]+$/g));
+                parsedKey = parsedKey.concat(
+                    map(indicesAndAttributes, function(bracketed) {
+                        return bracketed.replace(/[\[\]]/g, "");
+                    })
+                );
 
                 parsed.push({
                     val: val,
@@ -877,16 +881,27 @@ $.fn.repeater = function (fig) {
                     // match non empty brackets (ex: "[foo]")
                     var matches = $input.attr('name').match(/\[[^\]]+\]/g);
 
-                    var name = matches ?
-                        // strip "[" and "]" characters
-                        last(matches).replace(/\[|\]/g, '') :
-                        $input.attr('name');
+                    // supports nested attributes (ie a[0].b.c), does NOT support nested repeating attributes
+                    // (ie a[0].b[0].c)
+                    const name = $input
+                        .attr("name")
+                        .split(/(\[[^\]]+]\.)/g)
+                        .slice(-1)[0];
 
+                    // THIS OVERWRITES THE PARAMETER BINDING
+                    const newName =
+                        groupName +
+                        "[" +
+                        index +
+                        "]" +
+                        "." +
+                        name +
+                        ($input.is(":checkbox[data-repeater-boolean!='true']") ||
+                            $input.attr("multiple")
+                            ? "[]"
+                            : "");
 
-                    var newName = groupName + '[' + index + '][' + name + ']' +
-                        ($input.is(':checkbox') || $input.attr('multiple') ? '[]' : '');
-
-                    $input.attr('name', newName);
+                    $input.attr("name", newName);
 
                     $foreachRepeaterInItem(repeaters, $item, function (nestedFig) {
                         var $repeater = $(this);

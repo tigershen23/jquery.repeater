@@ -17,6 +17,10 @@ This fork has been modified in the following significant areas:
 `bower install jquery.repeater --save`
 `npm install jquery.repeater --save`
 
+## Build
+
+`grunt` (tests may fail because of Spring Boot modifications)
+
 ## Templates
 
 Repeater uses the first "data-repeater-item" as a template for added items.

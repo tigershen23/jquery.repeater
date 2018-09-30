@@ -343,6 +343,18 @@ var createInputText = function (fig) {
     return self;
 };
 
+var createInputNumber = function (fig) {
+    var my = {},
+        self = createInput(fig, my);
+     self.getType = function () {
+        return 'number';
+    };
+     self.$().on('change keyup keydown', function (e) {
+        my.publishChange(e, this);
+    });
+     return self;
+};
+
 var createInputTextarea = function (fig) {
     var my = {},
         self = createInput(fig, my);
@@ -376,6 +388,7 @@ var buildFormInputs = function (fig) {
     var constructor = fig.constructorOverride || {
         button: createInputButton,
         text: createInputText,
+        number: createInputNumber,
         url: createInputURL,
         email: createInputEmail,
         password: createInputPassword,
@@ -434,6 +447,9 @@ var buildFormInputs = function (fig) {
         else if($self.is('textarea')) {
             addInputsBasic('textarea', $self);
         }
+        else if($self.is('input[type="number"]')) {
+            addInputsBasic('number', $self);
+        }
         else if(
             $self.is('input[type="text"]') ||
             $self.is('input') && !$self.attr('type')
@@ -490,6 +506,7 @@ var buildFormInputs = function (fig) {
         addInputsBasic('url', 'input[type="url"]');
         addInputsBasic('range', 'input[type="range"]');
         addInputsBasic('textarea', 'textarea');
+        addInputsBasic('number', 'input[type="number"]');
         addInputsBasic('select', 'select:not([multiple])');
         addInputsBasic('select[multiple]', 'select[multiple]');
         addInputsBasic('file', 'input[type="file"]:not([multiple])');

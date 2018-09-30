@@ -888,15 +888,12 @@ $.fn.repeater = function (fig) {
             }
         };
 
-        var setIndexes = function ($items, groupName, repeaters) {
-            $items.each(function (index) {
-                var $item = $(this);
-                $item.data('item-name', groupName + '[' + index + ']');
-                $filterNested($item.find('[name]'), repeaters)
-                .each(function () {
-                    var $input = $(this);
-                    // match non empty brackets (ex: "[foo]")
-                    var matches = $input.attr('name').match(/\[[^\]]+\]/g);
+        const setIndexes = function($items, groupName, repeaters) {
+            $items.each(function(index) {
+                const $item = $(this);
+                $item.data("item-name", groupName + "[" + index + "]");
+                $filterNested($item.find("[name]"), repeaters).each(function() {
+                    const $input = $(this);
 
                     // supports nested attributes (ie a[0].b.c), does NOT support nested repeating attributes
                     // (ie a[0].b[0].c)
@@ -920,22 +917,35 @@ $.fn.repeater = function (fig) {
 
                     $input.attr("name", newName);
 
-                    $foreachRepeaterInItem(repeaters, $item, function (nestedFig) {
-                        var $repeater = $(this);
+                    $foreachRepeaterInItem(repeaters, $item, function(nestedFig) {
+                        const $repeater = $(this);
                         setIndexes(
-                            $filterNested($repeater.find('[data-repeater-item]'), nestedFig.repeaters || []),
-                            groupName + '[' + index + ']' +
-                                        '[' + $repeater.find('[data-repeater-list]').first().data('repeater-list') + ']',
+                            $filterNested(
+                                $repeater.find("[data-repeater-item]"),
+                                nestedFig.repeaters || []
+                            ),
+                            // THIS OVERWRITES THE PARAMETER BINDING
+                            groupName +
+                            "[" +
+                            index +
+                            "]" +
+                            "." +
+                            $repeater
+                            .find("[data-repeater-list]")
+                            .first()
+                            .data("repeater-list"),
                             nestedFig.repeaters
                         );
                     });
                 });
             });
 
-            $list.find('input[name][checked]')
-                .removeAttr('checked')
-                .prop('checked', true);
+            $list
+                .find("input[name][checked]")
+                .removeAttr("checked")
+                .prop("checked", true);
         };
+
 
         setIndexes($items(), getGroupName(), fig.repeaters);
         initNested($items());
